@@ -1,36 +1,21 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
-
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { InsightCard } from "./components/ui/insight-card";
+import { InteractiveBarChart } from "./components/ui/interactive-bar-chart";
+import { InteractivePieChart } from "./components/ui/interactive-pie-chart";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <div className="flex flex-row flex-wrap gap-2">
-      <Card className="">
-        <CardHeader>
-          <CardTitle>Card Title</CardTitle>
-          <CardDescription>Card Description</CardDescription>
-          <CardAction>Card Action</CardAction>
-        </CardHeader>
-        <CardContent>
-          <p>Card Content</p>
-        </CardContent>
-        <CardFooter>
-          <p>Card Footer</p>
-        </CardFooter>
-      </Card>
+    <div className="flex flex-row flex-wrap gap-4">
+      <InsightCard
+        name="Wins, Losses, and Draws"
+        description="A summary of the game results."
+        chart={<InteractiveBarChart />}
+      />
+      <InsightCard
+        name="Wins, Losses, and Draws"
+        description="A summary of the game results."
+        chart={<InteractivePieChart />}
+      />
     </div>
   );
 }
