@@ -1,25 +1,38 @@
-""" Unit tests for Lichess user results retrieval API."""
+"""Test cases for Lichess user statistics API endpoints."""
 
+from unittest.mock import patch
 from fastapi.testclient import TestClient
 from main import app
 
 client = TestClient(app)
 
-def test_get_user_results_success():
-    """Test retrieving user results successfully."""
-    response = client.get("/api/v1/user/mbband/results")
+@patch("lichess.api.user")
+def test_get_user_results_success(mock_lichess_user):
+    """Test retrieving Lichess user results successfully with mock."""
+    mock_lichess_user.return_value = {
+        "count": {
+            "win": 10,
+            "loss": 5,
+            "draw": 2
+        }
+    }
 
+    response = client.get("/api/v1/user/testuser/results")
     assert response.status_code == 200
+
     data = response.json()
+    assert data == {
+        "username": "testuser",
+        "wins": 10,
+        "losses": 5,
+        "draws": 2
+    }
 
-    assert "username" in data
-    assert data["username"].lower() == "mbband"
-    assert all(key in data for key in ["wins", "losses", "draws"])
-    assert all(isinstance(data[key], int) for key in ["wins", "losses", "draws"])
+@patch("lichess.api.user")
+def test_get_user_results_not_found(mock_lichess_user):
+    """Test Lichess user not found scenario using mock."""
+    mock_lichess_user.side_effect = Exception("User not found")
 
-def test_get_user_results_not_found():
-    """Test retrieving user results for a non-existent user."""
-    response = client.get("/api/v1/user/sally_bish_you_are_cinnamon/results")
-
+    response = client.get("/api/v1/user/unknownuser/results")
     assert response.status_code == 404
     assert "detail" in response.json()
