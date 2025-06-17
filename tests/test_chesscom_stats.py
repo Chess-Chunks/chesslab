@@ -1,39 +1,35 @@
-"""Test cases for Chess.com user statistics retrieval using FastAPI and mocking."""
+""" Test cases for chess.com user statistics endpoint."""
 
 from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
-from main import app
+from analytics_backend.main import app
+from analytics_backend.api.models.models import UserStatsResponse
 
 client = TestClient(app)
 
-@patch("analytics_backend.endpoints.chesscom_stats.get_player_stats")
-def test_get_chesscom_user_stats_success(mock_get_player_stats):
-    """Test successful retrieval of Chess.com user stats with mock."""
+@patch("analytics_backend.api.endpoints.chesscom_stats.get_player_stats")
+def test_get_chesscom_user_stats(mock_get_player_stats):
     mock_response = MagicMock()
     mock_response.json = {
         "stats": {
-            "chess_rapid": {"record": {"win": 12, "loss": 4, "draw": 3}},
-            "chess_blitz": {"record": {"win": 5, "loss": 1, "draw": 1}},
+            "chess_rapid": {"record": {"win": 10, "loss": 5, "draw": 3}},
+            "chess_blitz": {"record": {"win": 7, "loss": 8, "draw": 2}},
         }
     }
     mock_get_player_stats.return_value = mock_response
 
-    response = client.get("/api/v1/user/testuser/chesscom/results")
+    response = client.get("/testuser/chesscom/results")
     assert response.status_code == 200
     data = response.json()
-    assert data == {
-        "username": "testuser",
-        "wins": 17,
-        "losses": 5,
-        "draws": 4
-    }
+    expected = UserStatsResponse(username="testuser", wins=17, losses=13, draws=5).dict()
+    assert data == expected
 
+@patch("analytics_backend.api.endpoints.chesscom_stats.get_player_stats")
+def test_chesscom_user_stats_not_found(mock_get_player_stats):
+    mock_response = MagicMock()
+    mock_response.json = {"stats": {}}  
+    mock_get_player_stats.return_value = mock_response
 
-@patch("analytics_backend.endpoints.chesscom_stats.get_player_stats")
-def test_get_chesscom_user_stats_not_found(mock_get_player_stats):
-    """Test Chess.com user not found scenario using mock."""
-    mock_get_player_stats.side_effect = Exception("User not found")
-
-    response = client.get("/api/v1/user/unknownuser/chesscom/results")
+    response = client.get("/testuser/chesscom/results")
     assert response.status_code == 404
-    assert "detail" in response.json()
+    assert response.json()["detail"] == "Stats not found for user."

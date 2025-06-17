@@ -1,8 +1,9 @@
 """FastAPI application with basic routes"""
 
 from fastapi import FastAPI
-from api.v1.endpoints import lichess_stats
+from analytics_backend.api.endpoints import chesscom_stats, lichess_stats
 
 app = FastAPI()
 
-app.include_router(lichess_stats.router, prefix="/api/v1", tags=["lichess"])
+app.include_router(chesscom_stats.router)
+app.include_router(lichess_stats.router)

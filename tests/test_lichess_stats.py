@@ -1,38 +1,30 @@
-"""Test cases for Lichess user statistics API endpoints."""
+""""Test cases for Lichess user statistics endpoint."""
 
-from unittest.mock import patch
 from fastapi.testclient import TestClient
-from main import app
+from unittest.mock import patch
+from analytics_backend.main import app
+from analytics_backend.api.models.models import UserStatsResponse
 
 client = TestClient(app)
 
-@patch("lichess.api.user")
-def test_get_user_results_success(mock_lichess_user):
-    """Test retrieving Lichess user results successfully with mock."""
+@patch("analytics_backend.api.endpoints.lichess_stats.lichess.api.user")
+def test_get_lichess_user_stats(mock_lichess_user):
     mock_lichess_user.return_value = {
-        "count": {
-            "win": 10,
-            "loss": 5,
-            "draw": 2
-        }
+        "id": "testuser",
+        "count": {"win": 12, "loss": 6, "draw": 2}
     }
 
-    response = client.get("/api/v1/user/testuser/results")
+    response = client.get("/user/testuser/results")
     assert response.status_code == 200
-
     data = response.json()
-    assert data == {
-        "username": "testuser",
-        "wins": 10,
-        "losses": 5,
-        "draws": 2
-    }
+    expected = UserStatsResponse(username="testuser", wins=12, losses=6, draws=2).dict()
+    assert data == expected
 
-@patch("lichess.api.user")
-def test_get_user_results_not_found(mock_lichess_user):
-    """Test Lichess user not found scenario using mock."""
-    mock_lichess_user.side_effect = Exception("User not found")
+@patch("analytics_backend.api.endpoints.lichess_stats.lichess.api.user")
+def test_lichess_user_not_found(mock_lichess_user):
+    mock_lichess_user.return_value = None  # or {}
 
-    response = client.get("/api/v1/user/unknownuser/results")
+    response = client.get("/user/testuser/results")
     assert response.status_code == 404
-    assert "detail" in response.json()
+    assert "User not found" in response.json()["detail"]
+
