@@ -1,25 +1,30 @@
-""" Unit tests for Lichess user results retrieval API."""
+""""Test cases for Lichess user statistics endpoint."""
 
 from fastapi.testclient import TestClient
-from main import app
+from unittest.mock import patch
+from analytics_backend.main import app
+from analytics_backend.api.models.models import UserStatsResponse
 
 client = TestClient(app)
 
-def test_get_user_results_success():
-    """Test retrieving user results successfully."""
-    response = client.get("/api/v1/user/mbband/results")
+@patch("analytics_backend.api.endpoints.lichess_stats.lichess.api.user")
+def test_get_lichess_user_stats(mock_lichess_user):
+    mock_lichess_user.return_value = {
+        "id": "testuser",
+        "count": {"win": 12, "loss": 6, "draw": 2}
+    }
 
+    response = client.get("/user/testuser/results")
     assert response.status_code == 200
     data = response.json()
+    expected = UserStatsResponse(username="testuser", wins=12, losses=6, draws=2).dict()
+    assert data == expected
 
-    assert "username" in data
-    assert data["username"].lower() == "mbband"
-    assert all(key in data for key in ["wins", "losses", "draws"])
-    assert all(isinstance(data[key], int) for key in ["wins", "losses", "draws"])
+@patch("analytics_backend.api.endpoints.lichess_stats.lichess.api.user")
+def test_lichess_user_not_found(mock_lichess_user):
+    mock_lichess_user.return_value = None  # or {}
 
-def test_get_user_results_not_found():
-    """Test retrieving user results for a non-existent user."""
-    response = client.get("/api/v1/user/sally_bish_you_are_cinnamon/results")
-
+    response = client.get("/user/testuser/results")
     assert response.status_code == 404
-    assert "detail" in response.json()
+    assert "User not found" in response.json()["detail"]
+
