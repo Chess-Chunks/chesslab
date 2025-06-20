@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "./ui/mode-toggle";
 
 export function SiteHeader() {
