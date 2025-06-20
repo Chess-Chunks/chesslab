@@ -7,7 +7,7 @@ from api.models.models import UserStatsResponse
 
 client = TestClient(app)
 
-@patch("analytics_backend.api.endpoints.chesscom_stats.get_player_stats")
+@patch("api.endpoints.chesscom_stats.get_player_stats")
 def test_get_chesscom_user_stats(mock_get_player_stats):
     mock_response = MagicMock()
     mock_response.json = {
@@ -24,7 +24,7 @@ def test_get_chesscom_user_stats(mock_get_player_stats):
     expected = UserStatsResponse(username="testuser", wins=17, losses=13, draws=5).dict()
     assert data == expected
 
-@patch("analytics_backend.api.endpoints.chesscom_stats.get_player_stats")
+@patch("api.endpoints.chesscom_stats.get_player_stats")
 def test_chesscom_user_stats_not_found(mock_get_player_stats):
     mock_response = MagicMock()
     mock_response.json = {"stats": {}}  

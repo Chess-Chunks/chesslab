@@ -7,7 +7,7 @@ from api.models.models import UserStatsResponse
 
 client = TestClient(app)
 
-@patch("analytics_backend.api.endpoints.lichess_stats.lichess.api.user")
+@patch("api.endpoints.lichess_stats.lichess.api.user")
 def test_get_lichess_user_stats(mock_lichess_user):
     mock_lichess_user.return_value = {
         "id": "testuser",
@@ -20,7 +20,7 @@ def test_get_lichess_user_stats(mock_lichess_user):
     expected = UserStatsResponse(username="testuser", wins=12, losses=6, draws=2).dict()
     assert data == expected
 
-@patch("analytics_backend.api.endpoints.lichess_stats.lichess.api.user")
+@patch("api.endpoints.lichess_stats.lichess.api.user")
 def test_lichess_user_not_found(mock_lichess_user):
     mock_lichess_user.return_value = None  # or {}
 
