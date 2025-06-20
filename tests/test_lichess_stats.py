@@ -2,8 +2,8 @@
 
 from fastapi.testclient import TestClient
 from unittest.mock import patch
-from analytics_backend.main import app
-from analytics_backend.api.models.models import UserStatsResponse
+from main import app
+from api.models.models import UserStatsResponse
 
 client = TestClient(app)
 
