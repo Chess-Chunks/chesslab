@@ -35,7 +35,6 @@ platformdirs==4.3.6
 pre_commit==4.2.0
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
-pycairo==1.27.0
 pycparser==2.22
 pycups==2.0.4
 PyGObject==3.52.3
