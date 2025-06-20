@@ -26,7 +26,6 @@ jaraco.text==4.0.0
 keyutils==0.6
 more-itertools==10.6.0
 msgpack==1.0.5
-netsnmp-python==1.0a1
 nftables==0.1
 nodeenv==1.8.0
 npyscreen==4.10.5
