@@ -9,7 +9,7 @@ export function useInsights(
   username: string
 ) {
   return useQuery({
-    queryKey: ["insights", username],
+    queryKey: [`insights-${insight}-${platform}-${username}`, username],
     queryFn: () => fetchInsightByUsername(insight, platform, username),
   });
 }

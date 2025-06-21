@@ -1,20 +1,26 @@
+import { useState } from "react";
+
 import { SiteHeader } from "@/components/site-header";
 import { InsightFilters } from "./insight-filters";
 import { ResultsInsightCard } from "./results-insight-card";
 
+import { type Filters } from "@/lib/types";
+
 export function Dashboard() {
+  const [filters, setFilters] = useState<Filters>({
+    platform: "lichess",
+    username: "",
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+
   return (
     <>
       <SiteHeader />
       <div className="p-4 flex flex-col gap-4">
-        <InsightFilters />
+        <InsightFilters filters={filters} onChange={setFilters} />
         <div className="flex flex-row flex-wrap gap-4">
-          <ResultsInsightCard platform={"lichess"} username="JoelHutchy" />
-          {/* <InsightCard
-            name="Wins, Losses, and Draws"
-            description="A summary of the game results."
-            chart={<InteractiveBarChart />}
-          /> */}
+          <ResultsInsightCard filters={filters} />
         </div>
       </div>
     </>

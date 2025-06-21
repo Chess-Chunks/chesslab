@@ -1,17 +1,17 @@
 import { useInsights } from "@/hooks/useInsights";
-import { type Platform } from "@/lib/types";
+import { type Filters } from "@/lib/types";
 import { PieChartInsightCard } from "@/components/pie-chart-insight-card";
 
 type ResultsInsightCardProps = {
-  platform: Platform;
-  username: string;
+  filters: Filters;
 };
 
-export function ResultsInsightCard({
-  platform,
-  username,
-}: ResultsInsightCardProps) {
-  const { data, isLoading, error } = useInsights("results", platform, username);
+export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {
+  const { data, isLoading, error } = useInsights(
+    "results",
+    filters.platform,
+    filters.username
+  );
 
   return (
     <PieChartInsightCard

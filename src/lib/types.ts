@@ -1,3 +1,11 @@
+// Filters
+export interface Filters {
+  platform: Platform;
+  username: string;
+  startDate: Date;
+  endDate: Date;
+}
+
 export type Insight = "results";
 export type Platform = "chessdotcom" | "lichess";
 

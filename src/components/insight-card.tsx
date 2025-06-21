@@ -37,7 +37,7 @@ export function InsightCard({
           <Skeleton className="h-32 w-full rounded" />
         ) : (
           chart
-        )}{" "}
+        )}
       </CardContent>
       <CardFooter>
         <CardDescription>{description}</CardDescription>
