@@ -1,9 +1,8 @@
-import { useMemo } from "react";
-
+import { useEffect, useMemo, useState } from "react";
+import debounce from "lodash.debounce";
 import { type Filters, type Platform } from "@/lib/types";
 import { DatePicker } from "./ui/date-picker";
 import { Input } from "./ui/input";
-
 import {
   Select,
   SelectContent,
@@ -13,16 +12,33 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
-import debounce from "lodash.debounce";
-
 interface InsightFiltersProps {
   filters: Filters;
   onChange: (filters: Filters) => void;
 }
 
 export function InsightFilters({ filters, onChange }: InsightFiltersProps) {
+  const [username, setUsername] = useState(filters.username);
+
+  // Debounce onChange call, not the input itself
+  const debouncedOnChange = useMemo(
+    () =>
+      debounce((nextUsername: string) => {
+        onChange({ ...filters, username: nextUsername });
+      }, 1000),
+    [filters, onChange]
+  );
+
+  // Call debounced function when username local state changes
+  useEffect(() => {
+    debouncedOnChange(username);
+    return () => {
+      debouncedOnChange.cancel(); // cancel pending calls on unmount
+    };
+  }, [username, debouncedOnChange]);
+
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...filters, username: e.target.value });
+    setUsername(e.target.value); // updates immediately in the input
   };
 
   const handlePlatformChange = (platform: Platform) => {
@@ -46,7 +62,7 @@ export function InsightFilters({ filters, onChange }: InsightFiltersProps) {
       <div className="flex flex-col gap-2">
         <Label>Username</Label>
         <Input
-          value={filters.username}
+          value={username}
           onChange={handleUsernameChange}
           placeholder="Username"
           className="w-48"
