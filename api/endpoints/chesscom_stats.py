@@ -6,7 +6,7 @@ from ..models import UserStatsResponse
 
 router = APIRouter()
 
-@router.get("/{username}/chesscom/results", response_model=UserStatsResponse)
+@router.get("/api/v1/users/chessdotcom/{username}/results", response_model=UserStatsResponse)
 def get_chesscom_user_stats(username: str):
     """
     Retrieve user statistics from Chess.com.

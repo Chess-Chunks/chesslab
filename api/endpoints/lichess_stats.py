@@ -4,7 +4,7 @@ from ..models.models import UserStatsResponse
 
 router = APIRouter()
 
-@router.get("/user/{username}/results", response_model=UserStatsResponse)
+@router.get("/api/v1/users/lichess/{username}/results", response_model=UserStatsResponse)
 def get_user_results(username: str):
     try:
         user = lichess.api.user(username)
