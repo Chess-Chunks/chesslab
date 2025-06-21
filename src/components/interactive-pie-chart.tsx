@@ -4,61 +4,49 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-
-const chartData = [
-  {
-    name: "Wins",
-    value: 54,
-  },
-  {
-    name: "Draws",
-    value: 21,
-  },
-  {
-    name: "Losses",
-    value: 25,
-  },
-];
+import type { PieChartData } from "@/lib/types";
 
 const chartConfig = {
   wins: {
     label: "Wins",
-    color: "#2563eb",
+    color: "var(--chart-2)",
   },
   draws: {
     label: "Draws",
-    color: "#60a5fa",
+    color: "var(--chart-3)",
   },
   losses: {
     label: "Losses",
-    color: "#ef4444",
+    color: "var(--chart-1)",
   },
 } satisfies ChartConfig;
 
-export function InteractivePieChart() {
+interface InteractivePieChartProps {
+  data: PieChartData[];
+}
+
+export function InteractivePieChart({ data }: InteractivePieChartProps) {
   return (
-    <ChartContainer config={chartConfig} className="size-full">
+    <ChartContainer config={chartConfig} className="size-full min-h-48">
       <PieChart accessibilityLayer>
         <Pie
-          data={chartData}
+          data={data}
           nameKey="name"
           dataKey="value"
           cx="50%"
           cy="50%"
-          outerRadius={40}
+          outerRadius={60}
+          label
         >
-          {chartData.map((entry) => {
+          {data.map((entry) => {
             const key = entry.name.toLowerCase() as keyof typeof chartConfig;
             return <Cell key={entry.name} fill={chartConfig[key].color} />;
           })}
         </Pie>
 
         <ChartTooltip content={<ChartTooltipContent />} />
-        <ChartLegend content={<ChartLegendContent />} />
       </PieChart>
     </ChartContainer>
   );
