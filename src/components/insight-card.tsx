@@ -24,7 +24,7 @@ export function InsightCard({
   error = false,
 }: InsightCardProps) {
   return (
-    <Card className="w-full max-w-sm shadow-sm hover:shadow-lg transition-shadow duration-100">
+    <Card className="w-full min-h-72 max-h-72 shadow-sm hover:shadow-lg transition-shadow duration-100">
       <CardHeader>
         <CardTitle>{name}</CardTitle>
       </CardHeader>

@@ -58,7 +58,7 @@ export function InsightFilters({ filters, onChange }: InsightFiltersProps) {
   };
 
   return (
-    <div className="flex flex-row items-center gap-4">
+    <div className="flex flex-row items-center gap-4 flex-wrap">
       <div className="flex flex-col gap-2">
         <Label>Username</Label>
         <Input

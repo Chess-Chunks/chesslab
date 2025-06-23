@@ -29,7 +29,7 @@ interface InteractivePieChartProps {
 
 export function InteractivePieChart({ data }: InteractivePieChartProps) {
   return (
-    <ChartContainer config={chartConfig} className="size-full min-h-48">
+    <ChartContainer config={chartConfig} className="mx-auto min-h-12 max-h-32">
       <PieChart accessibilityLayer>
         <Pie
           data={data}
@@ -37,7 +37,7 @@ export function InteractivePieChart({ data }: InteractivePieChartProps) {
           dataKey="value"
           cx="50%"
           cy="50%"
-          outerRadius={60}
+          outerRadius={30}
           label
         >
           {data.map((entry) => {
