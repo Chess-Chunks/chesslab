@@ -14,7 +14,7 @@ def test_get_lichess_user_stats(mock_lichess_user):
         "count": {"win": 12, "loss": 6, "draw": 2}
     }
 
-    response = client.get("/user/testuser/results")
+    response = client.get("/api/v1/users/lichess/testuser/results")
     assert response.status_code == 200
     data = response.json()
     expected = UserStatsResponse(username="testuser", wins=12, losses=6, draws=2).dict()
@@ -24,7 +24,7 @@ def test_get_lichess_user_stats(mock_lichess_user):
 def test_lichess_user_not_found(mock_lichess_user):
     mock_lichess_user.return_value = None  # or {}
 
-    response = client.get("/user/testuser/results")
+    response = client.get("/api/v1/users/lichess/testuser/results")
     assert response.status_code == 404
     assert "User not found" in response.json()["detail"]
 
