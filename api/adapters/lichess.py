@@ -11,6 +11,10 @@ from api.adapters.base import BaseImportAdapter, SpeedType
 class LichessAdapter(BaseImportAdapter):
     """Adapter for fetching insights from Lichess."""
 
+    @property
+    def BASE_URL(self) -> str:
+        return "https://lichess.org/api"
+
     def _get_speed_perf_key(self, speed: SpeedType) -> str:
         return {
             "bullet": "bullet",
@@ -25,41 +29,18 @@ class LichessAdapter(BaseImportAdapter):
         start_date: Optional[date] = None,
         end_date: Optional[date] = None
     ) -> ResultSummary:
-        url = f"https://lichess.org/api/games/user/{self.username}"
-
-        params = {
-            "max": "100",
-            "pgnInJson": "true",
-            "clocks": "false",
-            "moves": "false",
-            "analysed": "false"
-        }
-        if speed:
-            params["perfType"] = speed
-
-        wins, losses, draws = 0, 0, 0
+        speed_key = self._get_speed_perf_key(speed) if speed else "blitz"
+        url = f"{self.BASE_URL}/user/{self.username}/perf/{speed_key}"
 
         async with ClientSession() as session:
-            async with session.get(url, params=params, headers={"Accept": "application/x-ndjson"}) as resp:
-                async for line in resp.content:
-                    if not line.strip():
-                        continue
-                    game = json.loads(line.decode())
+            async with session.get(url) as response:
+                response.raise_for_status()
+                data = await response.json()
 
-                    timestamp = datetime.utcfromtimestamp(game["createdAt"] // 1000).date()
-                    if start_date and timestamp < start_date:
-                        continue
-                    if end_date and timestamp > end_date:
-                        continue
-
-                    color = "white" if game["players"]["white"]["user"]["name"].lower() == self.username.lower() else "black"
-                    result = game["players"][color].get("result")
-
-                    if result == "win":
-                        wins += 1
-                    elif result == "loss":
-                        losses += 1
-                    elif result == "draw":
-                        draws += 1
-
-        return ResultSummary(wins=wins, losses=losses, draws=draws, speed=speed or "blitz")
+        stats = data.get("stat", {}).get("count", {})
+        return ResultSummary(
+            wins=stats.get("win", 0),
+            losses=stats.get("loss", 0),
+            draws=stats.get("draw", 0),
+            speed=speed or "blitz"
+        )
