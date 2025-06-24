@@ -1,45 +1,54 @@
-"""Chess.com Adapter for fetching chess ratings and results."""
+"""Chess.com API Adapter for fetching player statistics."""
 
-from typing import List, Optional
-from datetime import datetime, date
-import httpx
-from chessdotcom import get_player_stats
+from typing import Optional
+from datetime import date
+from fastapi import HTTPException
+from chessdotcom.endpoints import player_stats
 from api.models.insights import ResultSummary
-from api.adapters.base import BaseImportAdapter, SpeedType
-
-
-SPEED_MAP = {
-    "bullet": "chess_bullet",
-    "blitz": "chess_blitz",
-    "rapid": "chess_rapid",
-    "classical": "chess_daily"  
-}
+from api.adapters.base import BaseImportAdapter
+from api.enums import SpeedType
 
 class ChessDotComAdapter(BaseImportAdapter):
-    """Adapter for fetching insights from Chess.com."""
-    BASE_URL = "https://api.chess.com/pub/player"
 
-    async def fetch_result_summary(self, speed: Optional[SpeedType] = None, start_date: Optional[date] = None, end_date: Optional[date] = None) -> ResultSummary:
-        result = get_player_stats(self.username)
+    @property
+    def BASE_URL(self) -> str:
+        return "https://api.chess.com/pub/player"
+
+    async def fetch_result_summary(
+        self,
+        speed: Optional[SpeedType] = None,
+    ) -> ResultSummary:
+        try:
+            result = player_stats.get_player_stats(self.username)
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=f"Failed to fetch stats from Chess.com: {str(e)}")
+
         stats = result.stats
+        if isinstance(speed, str):
+            try:
+                speed = SpeedType(speed)
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Invalid speed: {speed}")
 
-        speed_map = {
-            "bullet": stats.chess_bullet,
-            "blitz": stats.chess_blitz,
-            "rapid": stats.chess_rapid,
-            "classical": stats.chess_daily,
-        }
+        speeds = [speed] if speed else list(SpeedType)
 
-        game_stats = speed_map.get(speed or "blitz")
+        wins, losses, draws = 0, 0, 0
 
-        if not game_stats or not game_stats.record:
-            return ResultSummary(wins=0, losses=0, draws=0, speed=speed or "blitz")
+        for s in speeds:
+            key = s.platform_key("chessdotcom")
+            game_stats = getattr(stats, key, None)
+            record = getattr(game_stats, "record", None)
 
-        record = game_stats.record
+            if not record:
+                continue
+
+            wins += record.win or 0
+            losses += record.loss or 0
+            draws += record.draw or 0
 
         return ResultSummary(
-            wins=record.win or 0,
-            losses=record.loss or 0,
-            draws=record.draw or 0,
-            speed=speed or "blitz"
+            wins=wins,
+            losses=losses,
+            draws=draws,
+            speed=speed if speed else SpeedType.BLITZ
         )

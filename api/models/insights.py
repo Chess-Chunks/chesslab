@@ -2,8 +2,7 @@
 
 from typing import Literal
 from pydantic import BaseModel
-
-SpeedType = Literal["bullet", "blitz", "rapid", "classical"]
+from api.enums import SpeedType
 
 class RatingInsight(BaseModel):
     """Model for rating insights."""
