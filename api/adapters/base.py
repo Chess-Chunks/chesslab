@@ -22,13 +22,3 @@ class BaseImportAdapter(ABC):
         optionally filtered by speed type and date range.
         """
         pass
-
-    @abstractmethod
-    async def fetch_rating_history(
-        self,
-        speed: Optional[SpeedType] = None
-    ) -> list[RatingInsight]:
-        """
-        Fetch rating history for the user, optionally filtered by speed.
-        """
-        pass

@@ -7,7 +7,6 @@ SpeedType = Literal["bullet", "blitz", "rapid", "classical"]
 
 class RatingInsight(BaseModel):
     """Model for rating insights."""
-    date: str
     rating: int
     speed: SpeedType
 

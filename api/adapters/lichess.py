@@ -1,13 +1,16 @@
 """Lichess API Adapter for fetching chess insights."""
 
-from typing import List, Optional
-from datetime import date
+from typing import Optional
+from datetime import date, datetime
+from aiohttp import ClientSession
+import json
 import lichess.api
 from api.models.insights import RatingInsight, ResultSummary
 from api.adapters.base import BaseImportAdapter, SpeedType
 
 class LichessAdapter(BaseImportAdapter):
     """Adapter for fetching insights from Lichess."""
+
     def _get_speed_perf_key(self, speed: SpeedType) -> str:
         return {
             "bullet": "bullet",
@@ -16,36 +19,47 @@ class LichessAdapter(BaseImportAdapter):
             "classical": "classical"
         }[speed]
 
-    async def fetch_rating_history(self, speed: Optional[SpeedType] = None) -> List[RatingInsight]:
-        user = lichess.api.user(self.username)
-        perfs = user.get("perfs", {})
-        speed_types = [speed] if speed else ["bullet", "blitz", "rapid", "classical"]
-
-        results = []
-        for s in speed_types:
-            rating = perfs.get(self._get_speed_perf_key(s), {}).get("rating")
-            if rating:
-                results.append(RatingInsight(
-                    date="recent",
-                    rating=rating,
-                    speed=s
-                ))
-        return results
-
     async def fetch_result_summary(
         self,
         speed: Optional[SpeedType] = None,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None
     ) -> ResultSummary:
-        user = lichess.api.user(self.username)
-        perfs = user.get("perfs", {})
-        key = self._get_speed_perf_key(speed or "blitz")
+        url = f"https://lichess.org/api/games/user/{self.username}"
 
-        perf = perfs.get(key, {})
-        return ResultSummary(
-            wins=perf.get("wins", 0),
-            losses=perf.get("losses", 0),
-            draws=perf.get("draws", 0),
-            speed=speed or "blitz"
-        )
+        params = {
+            "max": "100",
+            "pgnInJson": "true",
+            "clocks": "false",
+            "moves": "false",
+            "analysed": "false"
+        }
+        if speed:
+            params["perfType"] = speed
+
+        wins, losses, draws = 0, 0, 0
+
+        async with ClientSession() as session:
+            async with session.get(url, params=params, headers={"Accept": "application/x-ndjson"}) as resp:
+                async for line in resp.content:
+                    if not line.strip():
+                        continue
+                    game = json.loads(line.decode())
+
+                    timestamp = datetime.utcfromtimestamp(game["createdAt"] // 1000).date()
+                    if start_date and timestamp < start_date:
+                        continue
+                    if end_date and timestamp > end_date:
+                        continue
+
+                    color = "white" if game["players"]["white"]["user"]["name"].lower() == self.username.lower() else "black"
+                    result = game["players"][color].get("result")
+
+                    if result == "win":
+                        wins += 1
+                    elif result == "loss":
+                        losses += 1
+                    elif result == "draw":
+                        draws += 1
+
+        return ResultSummary(wins=wins, losses=losses, draws=draws, speed=speed or "blitz")
