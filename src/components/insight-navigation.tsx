@@ -1,8 +1,8 @@
 import { Card } from "@/components/ui/card";
 
-export function InsightNavigation() {
+export function InsightNavigation({ className }: { className?: string }) {
   return (
-    <Card className="w-1/3 h-full p-4">
+    <Card className={className}>
       <p>Navigation goes here</p>
     </Card>
   );

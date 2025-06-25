@@ -25,7 +25,7 @@ export function Dashboard() {
 
         <div className="flex flex-row gap-4 flex-1 overflow-hidden">
           {/* scrollable column */}
-          <div className="flex flex-col gap-4 w-2/3 pr-1 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+          <div className="flex flex-col gap-4 sm:w-2/3 w-full pr-1 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
             <ResultsInsightCard filters={filters} />
             <ResultsInsightCard filters={filters} />
             <ResultsInsightCard filters={filters} />
@@ -35,7 +35,7 @@ export function Dashboard() {
           </div>
 
           {/* sticky nav column */}
-          <InsightNavigation />
+          <InsightNavigation className="hidden sm:block sm:w-1/3 sm:h-full sm:p-4" />
         </div>
       </div>
     </div>
