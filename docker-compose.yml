@@ -1,0 +1,32 @@
+name: chesslab
+services:
+  chesslab-frontend:
+    image: chesslab-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vite-client
+    networks:
+      - chesslab-network
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    depends_on:
+      - chesslab-backend
+
+  chesslab-backend:
+    image: chesslab-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fastapi-server
+    networks:
+      - chesslab-network
+    ports:
+      - 8000:8000
+    restart: unless-stopped
+
+networks:
+  chesslab-network:
+    external: true
+    name: chesslab-network
