@@ -9,6 +9,8 @@ docker-compose.yml
 # Ignore node modules (if any)
 node_modules/
 
-# Ignore environment files
+# Ignore environment files besides the production one
 .env
-.env.*
+.env.local
+.env.development
+.env.test
