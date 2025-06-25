@@ -5,9 +5,7 @@ export const fetchInsightByUsername = async (
   platform: Platform,
   username: string
 ) => {
-  const res = await fetch(
-    `${import.meta.env.VITE_API_URL}/${platform}/${username}/${insight}`
-  );
+  const res = await fetch(`/api/v1/users/${platform}/${username}/${insight}`);
   if (!res.ok) {
     throw new Error(`Error fetching ${insight} for ${username} on ${platform}`);
   }
