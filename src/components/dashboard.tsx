@@ -1,28 +1,43 @@
-import { InsightCard } from "@/components/insight-card";
-import { InteractiveBarChart } from "@/components/interactive-bar-chart";
-import { InteractivePieChart } from "@/components/interactive-pie-chart";
+import { useState } from "react";
+
 import { SiteHeader } from "@/components/site-header";
-import { InsightFilters } from "./insight-filters";
+import { InsightFilters } from "@/components/insight-filters";
+import { ResultsInsightCard } from "@/components/results-insight-card";
+import { InsightNavigation } from "@/components/insight-navigation";
+
+import { type Filters } from "@/lib/types";
 
 export function Dashboard() {
+  const [filters, setFilters] = useState<Filters>({
+    platform: "lichess",
+    username: "",
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+
   return (
-    <>
+    <div className="h-screen flex flex-col">
       <SiteHeader />
-      <div className="p-4 flex flex-col gap-4">
-        <InsightFilters />
-        <div className="flex flex-row flex-wrap gap-4">
-          <InsightCard
-            name="Wins, Losses, and Draws"
-            description="A summary of the game results."
-            chart={<InteractiveBarChart />}
-          />
-          <InsightCard
-            name="Wins, Losses, and Draws"
-            description="A summary of the game results."
-            chart={<InteractivePieChart />}
-          />
+
+      {/* this grows and fills rest of viewport */}
+      <div className="flex flex-col gap-4 p-4 flex-1 overflow-hidden">
+        <InsightFilters filters={filters} onChange={setFilters} />
+
+        <div className="flex flex-row gap-4 flex-1 overflow-hidden">
+          {/* scrollable column */}
+          <div className="flex flex-col gap-4 sm:w-2/3 w-full pr-1 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+            <ResultsInsightCard filters={filters} />
+            <ResultsInsightCard filters={filters} />
+            <ResultsInsightCard filters={filters} />
+            <ResultsInsightCard filters={filters} />
+            <ResultsInsightCard filters={filters} />
+            <ResultsInsightCard filters={filters} />
+          </div>
+
+          {/* sticky nav column */}
+          <InsightNavigation className="hidden sm:block sm:w-1/3 sm:h-full sm:p-4" />
         </div>
       </div>
-    </>
+    </div>
   );
 }
