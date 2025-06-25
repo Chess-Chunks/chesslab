@@ -6,7 +6,6 @@ docker-run-all:
 	docker run -d  \
 	--name vite-client \
 	--network chesslab-network \
-	-e VITE_API_URL=http://fastapi-server:8000 \
 	-p 8080:8080 \
 	--restart unless-stopped \
 	chesslab-frontend
