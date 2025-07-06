@@ -9,6 +9,8 @@ interface PieChartInsightCardProps {
   data: PieChartData[];
   loading: boolean;
   error?: boolean;
+  className?: string;
+  id?: string;
 }
 
 export function PieChartInsightCard({
@@ -17,9 +19,13 @@ export function PieChartInsightCard({
   data,
   loading,
   error,
+  className,
+  id,
 }: PieChartInsightCardProps) {
   return (
     <InsightCard
+      id={id}
+      className={className}
       name={name}
       description={description}
       chart={

@@ -6,7 +6,7 @@ type ResultsInsightCardProps = {
   filters: Filters;
 };
 
-export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {
+export function RatingInsightCard({ filters }: ResultsInsightCardProps) {
   const { data, isLoading, error } = useInsights(
     "results",
     filters.platform,
@@ -15,9 +15,9 @@ export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {
 
   return (
     <PieChartInsightCard
-      id="results-history"
-      name="Results"
-      description="Wins, draws, and losses"
+      id="rating-history"
+      name="Rating History"
+      description="User rating history over time"
       data={[
         { name: "Wins", value: data?.wins },
         { name: "Draws", value: data?.draws },

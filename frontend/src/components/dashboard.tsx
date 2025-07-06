@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { InsightFilters } from "@/components/insight-filters";
 import { ResultsInsightCard } from "@/components/results-insight-card";
+import { RatingInsightCard } from "@/components/rating-insight-card";
 import { InsightNavigation } from "@/components/insight-navigation";
 
 import { type Filters } from "@/lib/types";
@@ -29,6 +30,10 @@ export function Dashboard() {
             <ResultsInsightCard filters={filters} />
             <ResultsInsightCard filters={filters} />
             <ResultsInsightCard filters={filters} />
+            <ResultsInsightCard filters={filters} />
+            <ResultsInsightCard filters={filters} />
+
+            <RatingInsightCard filters={filters} />
             <ResultsInsightCard filters={filters} />
             <ResultsInsightCard filters={filters} />
             <ResultsInsightCard filters={filters} />
