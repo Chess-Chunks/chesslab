@@ -1,16 +1,12 @@
-import { useMemo } from "react";
-
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-import { Button } from "./ui/button";
-
+import { INSIGHT_GROUPS } from "@/lib/constants";
 import {
   Trophy,
   Rabbit,
@@ -20,8 +16,6 @@ import {
   BarChart,
   LineChart,
 } from "lucide-react";
-
-import { INSIGHT_GROUPS } from "@/lib/constants";
 
 const iconMap = {
   Trophy,
@@ -35,30 +29,19 @@ const iconMap = {
 
 type InsightNavigationProps = {
   className?: string;
-  currentInsightId: string | null;
-  onInsightSelect?: (id: string) => void;
 };
 
-export function InsightNavigation({
-  className,
-  currentInsightId,
-  onInsightSelect,
-}: InsightNavigationProps) {
-
-  const activeGroup = useMemo(() => {
-    for (const group of INSIGHT_GROUPS) {
-      if (
-        group.insights.some((insight) => insight.value === currentInsightId)
-      ) {
-        return group.value;
-      }
-    }
-    return undefined;
-  }, [currentInsightId]);
+export function InsightNavigation({ className }: InsightNavigationProps) {
+  const [selectedGroup, setSelectedGroup] = useState<string | undefined>();
 
   return (
     <Card className={className}>
-      <Accordion type="single" value={activeGroup} collapsible>
+      <Accordion
+        type="single"
+        collapsible
+        value={selectedGroup}
+        onValueChange={(val) => setSelectedGroup(val)}
+      >
         {INSIGHT_GROUPS.map((group) => (
           <AccordionItem value={group.value} key={group.value}>
             <AccordionTrigger>{group.label}</AccordionTrigger>
@@ -67,29 +50,15 @@ export function InsightNavigation({
                 const Icon =
                   iconMap[insight.icon as keyof typeof iconMap] || Trophy;
 
-                const isActive = currentInsightId === insight.value;
-
                 return (
-                  <Button
+                  <a
                     key={insight.value}
-                    variant="ghost"
-                    className={`w-full flex items-center gap-2 justify-start ${
-                      isActive ? "bg-muted" : ""
-                    }`}
-                    onClick={() => {
-                      const el = document.getElementById(insight.value);
-                      if (el) {
-                        el.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                        onInsightSelect?.(insight.value);
-                      }
-                    }}
+                    href={`#${insight.value}`}
+                    className="w-full flex items-center gap-2 justify-start px-2 py-1 rounded-md hover:bg-muted transition-colors"
                   >
                     <Icon className="h-4 w-4" />
                     {insight.label}
-                  </Button>
+                  </a>
                 );
               })}
             </AccordionContent>
