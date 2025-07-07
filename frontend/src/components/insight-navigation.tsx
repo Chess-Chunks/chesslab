@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+
 import {
   Accordion,
   AccordionContent,
@@ -6,6 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "./ui/button";
+
 import {
   Trophy,
   Rabbit,
@@ -15,6 +17,8 @@ import {
   BarChart,
   LineChart,
 } from "lucide-react";
+
+import { INSIGHT_GROUPS } from "@/lib/constants";
 
 const iconMap = {
   Trophy,
@@ -27,54 +31,10 @@ const iconMap = {
 };
 
 export function InsightNavigation({ className }: { className?: string }) {
-  const insightGroups = [
-    {
-      label: "Games",
-      value: "games",
-      insights: [
-        { label: "Results", value: "results-history", icon: "Trophy" },
-        { label: "Rating History", value: "rating-history", icon: "LineChart" },
-      ],
-    },
-    {
-      label: "Openings",
-      value: "openings",
-      insights: [
-        {
-          label: "Popular Openings",
-          value: "popular-openings",
-          icon: "BookOpen",
-        },
-      ],
-    },
-    {
-      label: "Tactics",
-      value: "tactics",
-      insights: [
-        {
-          label: "Solved Tactics",
-          value: "solved-tactics",
-          icon: "Target",
-        },
-      ],
-    },
-    {
-      label: "Moves",
-      value: "moves",
-      insights: [
-        {
-          label: "Best Moves",
-          value: "best-moves",
-          icon: "Move",
-        },
-      ],
-    },
-  ];
-
   return (
     <Card className={className}>
       <Accordion type="single" collapsible>
-        {insightGroups.map((group) => (
+        {INSIGHT_GROUPS.map((group) => (
           <AccordionItem value={group.value} key={group.value}>
             <AccordionTrigger>{group.label}</AccordionTrigger>
             <AccordionContent>
