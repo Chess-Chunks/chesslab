@@ -5,6 +5,7 @@ import { InsightFilters } from "@/components/insight-filters";
 import { ResultsInsightCard } from "@/components/results-insight-card";
 import { RatingInsightCard } from "@/components/rating-insight-card";
 import { InsightNavigation } from "@/components/insight-navigation";
+import { TrackedInsight } from "@/components/tracked-insight";
 
 import { type Filters } from "@/lib/types";
 
@@ -34,21 +35,33 @@ export function Dashboard() {
       <div className="flex flex-1 flex-col md:flex-row gap-4 p-4 md:w-4/5 mx-auto">
         {/* Insight Cards */}
         <div className="flex flex-col gap-4 md:w-2/3 w-full">
-          <div id="results-history">
+          <TrackedInsight id="results-history">
             <ResultsInsightCard filters={filters} />
-          </div>
+          </TrackedInsight>
 
-          <div id="rating-history">
+          <TrackedInsight id="rating-history">
             <RatingInsightCard filters={filters} />
-          </div>
+          </TrackedInsight>
 
-          <div id="popular-openings">
+          <TrackedInsight id="popular-openings">
             <ResultsInsightCard filters={filters} />
-          </div>
+          </TrackedInsight>
 
-          <div id="solved-tactics">
+          <TrackedInsight id="solved-tactics">
             <ResultsInsightCard filters={filters} />
-          </div>
+          </TrackedInsight>
+
+          <TrackedInsight id="temp1">
+            <ResultsInsightCard filters={filters} />
+          </TrackedInsight>
+
+          <TrackedInsight id="temp2">
+            <ResultsInsightCard filters={filters} />
+          </TrackedInsight>
+
+          <TrackedInsight id="temp3">
+            <ResultsInsightCard filters={filters} />
+          </TrackedInsight>
         </div>
 
         {/* Sticky Navigation */}

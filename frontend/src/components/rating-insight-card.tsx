@@ -15,7 +15,6 @@ export function RatingInsightCard({ filters }: ResultsInsightCardProps) {
 
   return (
     <PieChartInsightCard
-      id="rating-history"
       name="Rating History"
       description="User rating history over time"
       data={[

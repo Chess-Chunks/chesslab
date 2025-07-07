@@ -1,40 +1,36 @@
 import { useEffect, useRef } from "react";
 
-export function TrackedInsight({
-  id,
-  children,
-  onVisible,
-  scrollContainerRef,
-}: {
+type Props = {
   id: string;
   children: React.ReactNode;
-  onVisible: (id: string) => void;
-  scrollContainerRef: React.RefObject<HTMLElement>;
-}) {
+};
+
+export function TrackedInsight({ id, children }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          onVisible(id);
+          history.replaceState(null, "", `#${id}`);
         }
       },
       {
-        root: scrollContainerRef.current,
         threshold: 0.5,
       }
     );
 
-    if (ref.current) observer.observe(ref.current);
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
 
     return () => {
       if (ref.current) observer.unobserve(ref.current);
     };
-  }, [id, onVisible, scrollContainerRef]);
+  }, [id]);
 
   return (
-    <div ref={ref} id={id}>
+    <div ref={ref} id={id} className="scroll-mt-16">
       {children}
     </div>
   );
