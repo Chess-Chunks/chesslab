@@ -14,6 +14,8 @@ interface InsightCardProps {
   chart: React.ReactNode;
   loading?: boolean;
   error?: boolean;
+  className?: string;
+  id?: string;
 }
 
 export function InsightCard({
@@ -22,9 +24,16 @@ export function InsightCard({
   chart,
   loading = false,
   error = false,
+  className,
+  id,
 }: InsightCardProps) {
   return (
-    <Card className="w-full min-h-72 max-h-72 shadow-sm hover:shadow-lg transition-shadow duration-100">
+    <Card
+      id={id}
+      className={`w-full min-h-72 max-h-72 shadow-sm hover:shadow-lg transition-shadow duration-100 ${
+        className ?? ""
+      }`}
+    >
       <CardHeader>
         <CardTitle>{name}</CardTitle>
       </CardHeader>

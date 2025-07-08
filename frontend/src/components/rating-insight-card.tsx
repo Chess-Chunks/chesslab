@@ -4,10 +4,9 @@ import { PieChartInsightCard } from "@/components/pie-chart-insight-card";
 
 type ResultsInsightCardProps = {
   filters: Filters;
-  ref?: React.Ref<HTMLDivElement>;
 };
 
-export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {
+export function RatingInsightCard({ filters }: ResultsInsightCardProps) {
   const { data, isLoading, error } = useInsights(
     "results",
     filters.platform,
@@ -16,9 +15,8 @@ export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {
 
   return (
     <PieChartInsightCard
-      id="results-history"
-      name="Results"
-      description="Wins, draws, and losses"
+      name="Rating History"
+      description="User rating history over time"
       data={[
         { name: "Wins", value: data?.wins },
         { name: "Draws", value: data?.draws },
