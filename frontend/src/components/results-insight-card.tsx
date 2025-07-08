@@ -4,6 +4,7 @@ import { PieChartInsightCard } from "@/components/pie-chart-insight-card";
 
 type ResultsInsightCardProps = {
   filters: Filters;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {

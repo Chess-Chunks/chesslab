@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Accordion,
@@ -29,10 +28,19 @@ const iconMap = {
 
 type InsightNavigationProps = {
   className?: string;
+  currentInsight?: string;
+  setCurrentInsight?: (insight: string) => void;
 };
 
-export function InsightNavigation({ className }: InsightNavigationProps) {
-  const [selectedGroup, setSelectedGroup] = useState<string | undefined>();
+export function InsightNavigation({
+  className,
+  currentInsight,
+  setCurrentInsight,
+}: InsightNavigationProps) {
+  // Find the group that contains the currentInsight
+  const selectedGroup = INSIGHT_GROUPS.find((group) =>
+    group.insights.some((insight) => insight.value === currentInsight)
+  )?.value;
 
   return (
     <Card className={className}>
@@ -40,7 +48,7 @@ export function InsightNavigation({ className }: InsightNavigationProps) {
         type="single"
         collapsible
         value={selectedGroup}
-        onValueChange={(val) => setSelectedGroup(val)}
+        onValueChange={() => {}}
       >
         {INSIGHT_GROUPS.map((group) => (
           <AccordionItem value={group.value} key={group.value}>
@@ -54,7 +62,13 @@ export function InsightNavigation({ className }: InsightNavigationProps) {
                   <a
                     key={insight.value}
                     href={`#${insight.value}`}
-                    className="w-full flex items-center gap-2 justify-start px-2 py-1 rounded-md hover:bg-muted transition-colors"
+                    className={`w-full flex items-center gap-2 justify-start px-2 py-1 rounded-md hover:bg-muted transition-colors ${
+                      currentInsight === insight.value ? "bg-muted" : ""
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentInsight?.(insight.value);
+                    }}
                   >
                     <Icon className="h-4 w-4" />
                     {insight.label}
