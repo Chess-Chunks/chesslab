@@ -13,10 +13,10 @@ class SpeedType(str, Enum):
         """Map internal speed types to platform-specific keys."""
         maps = {
             "chessdotcom": {
-                SpeedType.BULLET: "chess_bullet",
-                SpeedType.BLITZ: "chess_blitz",
-                SpeedType.RAPID: "chess_rapid",
-                SpeedType.CLASSICAL: "chess_daily",
+                SpeedType.BULLET: "bullet",
+                SpeedType.BLITZ: "blitz",
+                SpeedType.RAPID: "rapid",
+                SpeedType.CLASSICAL: "daily",
             },
             "lichess": {
                 SpeedType.BULLET: "bullet",
