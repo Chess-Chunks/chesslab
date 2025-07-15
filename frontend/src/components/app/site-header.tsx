@@ -1,4 +1,4 @@
-import { ModeToggle } from "./ui/mode-toggle";
+import { ModeToggle } from "../ui/mode-toggle";
 
 export function SiteHeader() {
   return (

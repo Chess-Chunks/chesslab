@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 
-import { SiteHeader } from "@/components/site-header";
-import { InsightFilters } from "@/components/insight-filters";
-import { InsightNavigation } from "@/components/insight-navigation";
+import { SiteHeader } from "@/components/app/site-header";
+import { InsightFilters } from "@/components/insights/insight-filters";
+import { InsightNavigation } from "@/components/insights/insight-navigation";
 
 import { useVisibleElements } from "@/hooks/useVisibleElements";
 

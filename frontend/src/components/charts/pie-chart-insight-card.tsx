@@ -1,5 +1,5 @@
 import type { PieChartData } from "@/lib/types";
-import { InsightCard } from "./insight-card";
+import { InsightCard } from "../insights/insight-card";
 import { InteractivePieChart } from "./interactive-pie-chart";
 import { PieChartSkeleton } from "./pie-chart-skeleton";
 

@@ -1,14 +1,13 @@
 import { useInsights } from "@/hooks/useInsights";
 import { type Filters } from "@/lib/types";
-import { PieChartInsightCard } from "@/components/pie-chart-insight-card";
-import { Trophy } from "lucide-react";
+import { PieChartInsightCard } from "@/components/charts/pie-chart-insight-card";
+import { LineChart } from "lucide-react";
 
 type ResultsInsightCardProps = {
   filters: Filters;
-  ref?: React.Ref<HTMLDivElement>;
 };
 
-export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {
+export function RatingInsightCard({ filters }: ResultsInsightCardProps) {
   const { data, isLoading, error } = useInsights(
     "results",
     filters.platform,
@@ -17,10 +16,9 @@ export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {
 
   return (
     <PieChartInsightCard
-      id="results-history"
-      name="Results"
-      icon={<Trophy className="h-5 w-5" />}
-      description="Wins, draws, and losses"
+      name="Rating History"
+      icon={<LineChart className="h-5 w-5" />}
+      description="User rating history over time"
       data={[
         { name: "Wins", value: data?.wins },
         { name: "Draws", value: data?.draws },

@@ -1,5 +1,5 @@
-import { ResultsInsightCard } from "@/components/results-insight-card";
-import { RatingInsightCard } from "@/components/rating-insight-card";
+import { ResultsInsightCard } from "@/components/insights/results-insight-card";
+import { RatingInsightCard } from "@/components/insights/rating-insight-card";
 import type { Filters } from "./types";
 
 type InsightCardProps = {
