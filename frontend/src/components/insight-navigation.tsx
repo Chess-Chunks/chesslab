@@ -11,10 +11,12 @@ import {
   Rabbit,
   BookOpen,
   Target,
+  Swords,
   Move,
   BarChart,
   LineChart,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const iconMap = {
   Trophy,
@@ -24,6 +26,7 @@ const iconMap = {
   Move,
   BarChart,
   LineChart,
+  Swords,
 };
 
 type InsightNavigationProps = {
@@ -37,22 +40,38 @@ export function InsightNavigation({
   currentInsight,
   setCurrentInsight,
 }: InsightNavigationProps) {
-  // Find the group that contains the currentInsight
-  const selectedGroup = INSIGHT_GROUPS.find((group) =>
-    group.insights.some((insight) => insight.value === currentInsight)
-  )?.value;
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+
+  useEffect(() => {
+    const selected = INSIGHT_GROUPS.find((group) =>
+      group.insights.some((insight) => insight.value === currentInsight)
+    )?.value;
+    if (selected && selected !== openGroup) {
+      setOpenGroup(selected);
+    }
+  }, [currentInsight]);
 
   return (
     <Card className={className}>
       <Accordion
         type="single"
         collapsible
-        value={selectedGroup}
-        onValueChange={() => {}}
+        onValueChange={(val) => setOpenGroup(val)}
       >
         {INSIGHT_GROUPS.map((group) => (
           <AccordionItem value={group.value} key={group.value}>
-            <AccordionTrigger>{group.label}</AccordionTrigger>
+            <AccordionTrigger>
+              <div className="flex items-center gap-2">
+                {group.icon &&
+                  (() => {
+                    const GroupIcon =
+                      iconMap[group.icon as keyof typeof iconMap] || Trophy;
+                    return <GroupIcon className="h-4 w-4" />;
+                  })()}
+                {group.label}
+              </div>
+            </AccordionTrigger>
+
             <AccordionContent>
               {group.insights.map((insight) => {
                 const Icon =
