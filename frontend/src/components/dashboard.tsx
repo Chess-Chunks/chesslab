@@ -18,12 +18,8 @@ export function Dashboard() {
     endDate: new Date(),
   });
 
-  const insights = useMemo(
-    () =>
-      INSIGHT_GROUPS.flatMap((group) =>
-        group.insights.map((insight) => insight.value)
-      ),
-    []
+  const insights = INSIGHT_GROUPS.flatMap((group) =>
+    group.insights.map((insight) => insight.value)
   );
 
   const insightRefs = useMemo(
@@ -51,7 +47,7 @@ export function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Sticky Site Header */}
-      <div className="sticky top-0 z-50 bg-background border-b">
+      <div className="bg-background border-b">
         <SiteHeader />
       </div>
 
@@ -79,7 +75,7 @@ export function Dashboard() {
                     key={insight.value}
                     id={insight.value}
                     ref={insightRefs[flatIndex]}
-                    className="scroll-mt-16"
+                    className="scroll-mt-2"
                   >
                     <InsightComponent filters={filters} />
                   </div>
