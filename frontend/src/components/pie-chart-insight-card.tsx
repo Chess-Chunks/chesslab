@@ -5,6 +5,7 @@ import { PieChartSkeleton } from "./pie-chart-skeleton";
 
 interface PieChartInsightCardProps {
   name: string;
+  icon: React.ReactNode;
   description: string;
   data: PieChartData[];
   loading: boolean;
@@ -15,6 +16,7 @@ interface PieChartInsightCardProps {
 
 export function PieChartInsightCard({
   name,
+  icon,
   description,
   data,
   loading,
@@ -27,6 +29,7 @@ export function PieChartInsightCard({
       id={id}
       className={className}
       name={name}
+      icon={icon}
       description={description}
       chart={
         loading ? (

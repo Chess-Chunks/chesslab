@@ -1,6 +1,7 @@
 import { useInsights } from "@/hooks/useInsights";
 import { type Filters } from "@/lib/types";
 import { PieChartInsightCard } from "@/components/pie-chart-insight-card";
+import { Trophy } from "lucide-react";
 
 type ResultsInsightCardProps = {
   filters: Filters;
@@ -18,6 +19,7 @@ export function ResultsInsightCard({ filters }: ResultsInsightCardProps) {
     <PieChartInsightCard
       id="results-history"
       name="Results"
+      icon={<Trophy className="h-5 w-5" />}
       description="Wins, draws, and losses"
       data={[
         { name: "Wins", value: data?.wins },

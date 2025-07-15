@@ -6,10 +6,9 @@ import { InsightNavigation } from "@/components/insight-navigation";
 
 import { useVisibleElements } from "@/hooks/useVisibleElements";
 
-import { type Filters } from "@/lib/types";
-
 import { INSIGHT_GROUPS } from "@/lib/constants";
 import { INSIGHT_COMPONENT_MAP } from "@/lib/insightComponentsMap";
+import { type Filters } from "@/lib/types";
 
 export function Dashboard() {
   const [filters, setFilters] = useState<Filters>({
@@ -19,8 +18,12 @@ export function Dashboard() {
     endDate: new Date(),
   });
 
-  const insights = INSIGHT_GROUPS.flatMap((group) =>
-    group.insights.map((insight) => insight.value)
+  const insights = useMemo(
+    () =>
+      INSIGHT_GROUPS.flatMap((group) =>
+        group.insights.map((insight) => insight.value)
+      ),
+    []
   );
 
   const insightRefs = useMemo(
@@ -32,6 +35,10 @@ export function Dashboard() {
     insightRefs as React.RefObject<HTMLElement>[]
   );
 
+  const setInsight = useCallback((id: string) => {
+    window.location.hash = `#${id}`;
+  }, []);
+
   useEffect(() => {
     if (topVisibleIndex != null) {
       const id = insights[topVisibleIndex];
@@ -40,10 +47,6 @@ export function Dashboard() {
       }
     }
   }, [topVisibleIndex, insights]);
-
-  const setInsight = useCallback((id: string) => {
-    window.location.hash = `#${id}`;
-  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -59,21 +62,23 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex flex-1 flex-col md:flex-row gap-4 p-4 md:w-4/5 mx-auto">
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col md:flex-row gap-4 p-4 w-4/5 mx-auto">
         {/* Insight Cards */}
         <div className="flex flex-col gap-4 md:w-2/3 w-full">
           {INSIGHT_GROUPS.map((group) => (
             <div key={group.value} className="space-y-4">
-              {group.insights.map((insight) => {
+              {group.insights.map((insight, idx) => {
                 const InsightComponent = INSIGHT_COMPONENT_MAP[insight.value];
                 if (!InsightComponent) return null;
+
+                const flatIndex = insights.indexOf(insight.value);
 
                 return (
                   <div
                     key={insight.value}
                     id={insight.value}
-                    ref={insightRefs[group.insights.indexOf(insight)]}
+                    ref={insightRefs[flatIndex]}
                     className="scroll-mt-16"
                   >
                     <InsightComponent filters={filters} />

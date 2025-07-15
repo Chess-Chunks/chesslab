@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface InsightCardProps {
   name: string;
+  icon: React.ReactNode;
   description: string;
   chart: React.ReactNode;
   loading?: boolean;
@@ -20,6 +21,7 @@ interface InsightCardProps {
 
 export function InsightCard({
   name,
+  icon,
   description,
   chart,
   loading = false,
@@ -30,12 +32,15 @@ export function InsightCard({
   return (
     <Card
       id={id}
-      className={`w-full min-h-72 max-h-72 shadow-sm hover:shadow-lg transition-shadow duration-100 ${
+      className={`w-full min-h-72 max-h-72 justify-between shadow-sm hover:shadow-lg transition-shadow duration-100 ${
         className ?? ""
       }`}
     >
       <CardHeader>
-        <CardTitle>{name}</CardTitle>
+        <div className="flex items-center space-x-2">
+          {icon && <span>{icon}</span>}
+          <CardTitle className="m-0">{name}</CardTitle>
+        </div>
       </CardHeader>
       <CardContent>
         {error ? (
