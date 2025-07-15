@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import debounce from "lodash.debounce";
 import { type Filters, type Platform } from "@/lib/types";
-import { DatePicker } from "./ui/date-picker";
-import { Input } from "./ui/input";
+import { DatePicker } from "../ui/date-picker";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,

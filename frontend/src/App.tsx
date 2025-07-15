@@ -1,6 +1,6 @@
 import "./App.css";
-import { Dashboard } from "./components/dashboard";
-import { ThemeProvider } from "./components/theme-provider";
+import { Dashboard } from "./components/app/dashboard";
+import { ThemeProvider } from "./components/app/theme-provider";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
