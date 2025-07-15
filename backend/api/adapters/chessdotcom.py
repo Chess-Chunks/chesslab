@@ -8,6 +8,8 @@ from api.models.insights import ResultSummary
 from api.adapters.base import BaseImportAdapter
 from api.enums import SpeedType
 
+from chessdotcom.endpoints.player_stats import get_player_stats
+
 
 class ChessDotComAdapter(BaseImportAdapter):
     """Adapter for fetching insights from Chess.com via HTTP API."""
@@ -24,11 +26,34 @@ class ChessDotComAdapter(BaseImportAdapter):
         color: Optional[str] = None,
     ) -> ResultSummary:
         username = self.username.lower()
-
         speed = speed or SpeedType.BLITZ
         expected_time_class = (
             "daily" if speed == SpeedType.CLASSICAL else speed.value
         )
+
+        if start_date is None and end_date is None:
+            try:
+                resp = get_player_stats(username)
+            except Exception as e:
+                raise HTTPException(
+                    status_code=503,
+                    detail=f"Failed to fetch stats via wrapper: {e}",
+                )
+            stats = resp.stats
+            game_stats = getattr(stats, f"chess_{expected_time_class}", None)
+            record = game_stats.record if game_stats and game_stats.record else None
+
+            wins = record.win or 0 if record else 0
+            losses = record.loss or 0 if record else 0
+            draws = record.draw or 0 if record else 0
+
+            return ResultSummary(
+                wins=wins,
+                losses=losses,
+                draws=draws,
+                speed=speed,
+            )
+
         start_date = start_date or date.min
         end_date = end_date or date.max
 
@@ -66,9 +91,7 @@ class ChessDotComAdapter(BaseImportAdapter):
 
                 for game in games:
                     game_id = game.get("url")
-                    if not game_id:
-                        continue
-                    if game_id in seen_game_ids:
+                    if not game_id or game_id in seen_game_ids:
                         continue
                     seen_game_ids.add(game_id)
 
@@ -95,11 +118,6 @@ class ChessDotComAdapter(BaseImportAdapter):
 
                     if color and player_color != color.lower():
                         continue
-
-                    print(
-                        f"[COUNT] {game_id} | {player_color} | "
-                        f"{game.get('time_class')} | {result_code} | {game_end}"
-                    )
 
                     wins, losses, draws = self._tally_result(
                         result_code, wins, losses, draws
