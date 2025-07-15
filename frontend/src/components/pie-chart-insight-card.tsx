@@ -35,7 +35,9 @@ export function PieChartInsightCard({
         loading ? (
           <PieChartSkeleton />
         ) : error ? (
-          <div className="text-sm text-red-500">Error loading chart</div>
+          <div className="text-sm text-center text-red-500">
+            Error loading chart
+          </div>
         ) : (
           <InteractivePieChart data={data} />
         )
