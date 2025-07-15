@@ -20,4 +20,34 @@ export const INSIGHT_GROUPS = [
       },
     ],
   },
+  {
+    label: "Performance",
+    value: "performance",
+    icon: "BarChart",
+    insights: [
+      {
+        label: "Performance Over Time",
+        value: "performance-over-time",
+        icon: "BarChart",
+      },
+      {
+        label: "Accuracy Breakdown",
+        value: "accuracy-breakdown",
+        icon: "LineChart",
+      },
+    ],
+  },
+  {
+    label: "Analysis",
+    value: "analysis",
+    icon: "Target",
+    insights: [
+      {
+        label: "Mistakes and Blunders",
+        value: "mistakes-blunders",
+        icon: "Move",
+      },
+      { label: "Best Moves", value: "best-moves", icon: "Move" },
+    ],
+  },
 ];

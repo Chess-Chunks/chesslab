@@ -12,4 +12,8 @@ export const INSIGHT_COMPONENT_MAP: Record<
 > = {
   "results-history": ResultsInsightCard,
   "rating-history": RatingInsightCard,
+  "popular-openings": RatingInsightCard, //
+  "accuracy-breakdown": RatingInsightCard, // Placeholder for actual component
+  "performance-over-time": RatingInsightCard, // Placeholder for actual component
+  "mistakes-blunders": RatingInsightCard, // Placeholder for actual component
 };

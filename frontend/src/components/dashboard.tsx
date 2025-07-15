@@ -68,7 +68,7 @@ export function Dashboard() {
         <div className="flex flex-col gap-4 md:w-2/3 w-full">
           {INSIGHT_GROUPS.map((group) => (
             <div key={group.value} className="space-y-4">
-              {group.insights.map((insight, idx) => {
+              {group.insights.map((insight) => {
                 const InsightComponent = INSIGHT_COMPONENT_MAP[insight.value];
                 if (!InsightComponent) return null;
 
