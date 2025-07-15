@@ -15,6 +15,10 @@ import {
   Move,
   BarChart,
   LineChart,
+  LayoutGrid,
+  Zap,
+  Puzzle,
+  Turtle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -27,6 +31,10 @@ const iconMap = {
   BarChart,
   LineChart,
   Swords,
+  LayoutGrid,
+  Zap,
+  Puzzle,
+  Turtle,
 };
 
 type InsightNavigationProps = {

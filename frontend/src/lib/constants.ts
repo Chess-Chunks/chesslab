@@ -1,8 +1,8 @@
 export const INSIGHT_GROUPS = [
   {
-    label: "Games",
-    value: "games",
-    icon: "Swords",
+    label: "Performance",
+    value: "performance",
+    icon: "BarChart",
     insights: [
       { label: "Results", value: "results-history", icon: "Trophy" },
       { label: "Rating History", value: "rating-history", icon: "LineChart" },
@@ -21,33 +21,49 @@ export const INSIGHT_GROUPS = [
     ],
   },
   {
-    label: "Performance",
-    value: "performance",
-    icon: "BarChart",
+    label: "Positional Play",
+    value: "positional-play",
+    icon: "LayoutGrid",
     insights: [
       {
-        label: "Performance Over Time",
-        value: "performance-over-time",
-        icon: "BarChart",
-      },
-      {
-        label: "Accuracy Breakdown",
-        value: "accuracy-breakdown",
-        icon: "LineChart",
+        label: "Quiet Moves",
+        value: "quiet-moves",
+        icon: "Turtle",
       },
     ],
   },
   {
-    label: "Analysis",
-    value: "analysis",
+    label: "Tactics",
+    value: "tactics",
+    icon: "Zap",
+    insights: [
+      {
+        label: "Trends",
+        value: "tactical-trends",
+        icon: "Target",
+      },
+      {
+        label: "Puzzles",
+        value: "puzzle-performance",
+        icon: "Puzzle",
+      },
+    ],
+  },
+  {
+    label: "Endgames",
+    value: "endgames",
     icon: "Target",
     insights: [
       {
-        label: "Mistakes and Blunders",
-        value: "mistakes-blunders",
-        icon: "Move",
+        label: "Performance",
+        value: "endgame-accuracy",
+        icon: "BarChart",
       },
-      { label: "Best Moves", value: "best-moves", icon: "Move" },
+      {
+        label: "Weak Spots",
+        value: "endgame-trends",
+        icon: "Target",
+      },
     ],
   },
 ];
