@@ -44,3 +44,12 @@ class LichessAdapter(BaseImportAdapter):
             draws=stats.get("draw", 0),
             speed=speed or "blitz"
         )
+    
+    async def fetch_rating_history(
+    self,
+    speed: Optional[SpeedType] = None,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    ) -> ResultSummary:
+        # TODO: Implement this method to fetch rating history
+        raise NotImplementedError("Rating history fetching is not implemented yet.")
