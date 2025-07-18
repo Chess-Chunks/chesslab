@@ -42,7 +42,11 @@ async def get_user_result_summary(
         color=color,
     )
 
-@router.get("/api/v1/users/{platform}/{username}/rating-history", response_model=ResultSummary)
+
+@router.get(
+    "/api/v1/users/{platform}/{username}/rating-history",
+    response_model=list[RatingInsight],
+)
 async def get_user_rating_history(
     platform: Literal["chessdotcom", "lichess"],
     username: str,

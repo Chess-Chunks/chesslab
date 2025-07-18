@@ -1,6 +1,6 @@
 """Lichess API Adapter for fetching chess insights."""
 
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 from aiohttp import ClientSession
 import json
@@ -44,12 +44,52 @@ class LichessAdapter(BaseImportAdapter):
             draws=stats.get("draw", 0),
             speed=speed or "blitz"
         )
-    
+
     async def fetch_rating_history(
-    self,
-    speed: Optional[SpeedType] = None,
-    start_date: Optional[date] = None,
-    end_date: Optional[date] = None,
-    ) -> ResultSummary:
-        # TODO: Implement this method to fetch rating history
-        raise NotImplementedError("Rating history fetching is not implemented yet.")
+        self,
+        speed: Optional[SpeedType] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+    ) -> List[RatingInsight]:
+        """
+        Fetch the user's daily rating history for the specified speed,
+        optionally filtered by date range. Only Bullet, Blitz, Rapid, Classical.
+        """
+
+        perf_names = {
+            SpeedType.BULLET:    "Bullet",
+            SpeedType.BLITZ:     "Blitz",
+            SpeedType.RAPID:     "Rapid",
+            SpeedType.CLASSICAL: "Classical",
+        }
+
+        speeds_to_fetch = [speed] if speed else list(perf_names.keys())
+
+        url = f"{self.BASE_URL}/user/{self.username}/rating-history"
+        async with ClientSession() as session:
+            async with session.get(url) as resp:
+                resp.raise_for_status()
+                all_perfs = await resp.json()
+
+        insights: List[RatingInsight] = []
+
+        for sp in speeds_to_fetch:
+            name = perf_names[sp]
+            perf_obj = next((p for p in all_perfs if p.get("name") == name), None)
+            if not perf_obj or not perf_obj.get("points"):
+                continue
+
+            for year, month0, day, rating in perf_obj["points"]:
+                dt = date(year, month0 + 1, day)
+                if start_date and dt < start_date:
+                    continue
+                if end_date and dt > end_date:
+                    continue
+
+                insights.append(RatingInsight(
+                    date=dt,
+                    rating=rating,
+                ))
+
+        insights.sort(key=lambda ri: (ri.date))
+        return insights
