@@ -14,3 +14,8 @@ export interface PieChartData {
   name: string;
   value: number;
 }
+
+export interface AreaChartData {
+  name: string;
+  value: number;
+}
