@@ -1,6 +1,6 @@
 import { useInsights } from "@/hooks/useInsights";
 import { type Filters } from "@/lib/types";
-import { PieChartInsightCard } from "@/components/charts/pie-chart-insight-card";
+import { AreaChartInsightCard } from "@/components/charts/area-chart-insight-card";
 import { LineChart } from "lucide-react";
 
 type ResultsInsightCardProps = {
@@ -15,7 +15,7 @@ export function RatingInsightCard({ filters }: ResultsInsightCardProps) {
   );
 
   return (
-    <PieChartInsightCard
+    <AreaChartInsightCard
       name="Rating History"
       icon={<LineChart className="h-5 w-5" />}
       description="User rating history over time"

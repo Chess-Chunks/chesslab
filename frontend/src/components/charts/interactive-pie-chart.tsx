@@ -96,36 +96,32 @@ export function InteractivePieChart({ data }: InteractivePieChartProps) {
   const isMobile = useIsMobile();
 
   return (
-    <>
-      <ChartContainer
-        config={chartConfig}
-        className="mx-auto my-auto min-h-64 max-h-64 max-w-full"
-      >
-        <PieChart width={500} height={500} accessibilityLayer>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={true}
-            label={renderCustomizedLabel}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-          >
-            {data.map((entry) => (
-              <Cell
-                key={`cell-${entry.name}`}
-                fill={
-                  chartConfig[entry.name as keyof typeof chartConfig]?.color
-                }
-              />
-            ))}
-          </Pie>
-          {!isMobile ? (
-            <Legend layout="vertical" align="right" verticalAlign="middle" />
-          ) : null}
-        </PieChart>
-      </ChartContainer>
-    </>
+    <ChartContainer
+      config={chartConfig}
+      className="mx-auto my-auto min-h-64 max-h-64 max-w-full"
+    >
+      <PieChart width={500} height={500} accessibilityLayer>
+        <Pie
+          data={data}
+          cx="50%"
+          cy="50%"
+          labelLine={true}
+          label={renderCustomizedLabel}
+          outerRadius={80}
+          fill="#8884d8"
+          dataKey="value"
+        >
+          {data.map((entry) => (
+            <Cell
+              key={`cell-${entry.name}`}
+              fill={chartConfig[entry.name as keyof typeof chartConfig]?.color}
+            />
+          ))}
+        </Pie>
+        {!isMobile ? (
+          <Legend layout="vertical" align="right" verticalAlign="middle" />
+        ) : null}
+      </PieChart>
+    </ChartContainer>
   );
 }

@@ -1,10 +1,10 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 import re
 import httpx
 from fastapi import HTTPException
 
-from api.models.insights import ResultSummary
+from api.models.insights import ResultSummary, RatingInsight
 from api.adapters.base import BaseImportAdapter
 from api.enums import SpeedType
 
@@ -158,3 +158,73 @@ class ChessDotComAdapter(BaseImportAdapter):
             draws += 1
 
         return wins, losses, draws
+
+    async def fetch_rating_history(
+        self,
+        speed: Optional[SpeedType] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+    ) -> List[RatingInsight]:
+        """Overrides BaseImportAdapter.fetch_rating_history."""
+
+        speed = speed or SpeedType.BLITZ
+        expected_time_class = "daily" if speed == SpeedType.CLASSICAL else speed.value
+
+        start_date = start_date or date.min
+        end_date = end_date or date.max
+
+        cur = date(start_date.year, start_date.month, 1)
+        last_month = date(end_date.year, end_date.month, 1)
+        months: List[tuple[int, int]] = []
+        while cur <= last_month:
+            months.append((cur.year, cur.month))
+            if cur.month == 12:
+                cur = date(cur.year + 1, 1, 1)
+            else:
+                cur = date(cur.year, cur.month + 1, 1)
+
+        last_by_date: dict[date, tuple[int, int]] = {}
+
+        async with httpx.AsyncClient() as client:
+            for yr, mo in months:
+                url = f"{self.BASE_URL}/{self.username}/games/{yr}/{mo:02d}"
+                try:
+                    resp = await client.get(url)
+                    resp.raise_for_status()
+                except httpx.HTTPStatusError:
+                    continue
+                except httpx.RequestError:
+                    continue
+
+                data = resp.json()
+                for game in data.get("games", []):
+                    if game.get("time_class") != expected_time_class:
+                        continue
+
+                    end_ts = game.get("end_time")
+                    if not end_ts:
+                        continue
+
+                    game_day = datetime.utcfromtimestamp(end_ts).date()
+                    if not (start_date <= game_day <= end_date):
+                        continue
+
+                    white = game.get("white", {})
+                    black = game.get("black", {})
+                    uname = self.username.lower()
+                    if white.get("username", "").lower() == uname:
+                        rating = white.get("rating")
+                    elif black.get("username", "").lower() == uname:
+                        rating = black.get("rating")
+                    else:
+                        continue
+
+                    prev = last_by_date.get(game_day)
+                    if not prev or end_ts > prev[0]:
+                        last_by_date[game_day] = (end_ts, rating)
+
+        insights = [
+            RatingInsight(date=d, rating=r)
+            for d, (_, r) in sorted(last_by_date.items())
+        ]
+        return insights

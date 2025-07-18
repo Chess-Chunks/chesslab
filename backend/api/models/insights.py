@@ -1,13 +1,14 @@
 """This module defines data models for insights related to chess ratings and results."""
 
-from typing import Literal
+from datetime import date
 from pydantic import BaseModel
 from api.enums import SpeedType
 
 class RatingInsight(BaseModel):
-    """Model for rating insights."""
+    """Single-day rating for a given speed."""
+    date: date
     rating: int
-    speed: SpeedType
+
 
 class ResultSummary(BaseModel):
     """Model for summarizing game results."""
