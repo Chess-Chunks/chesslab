@@ -18,7 +18,7 @@ Client.request_config["headers"]["User-Agent"] = (
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://chesslab-frontend:8080"],
+    allow_origins=["http://localhost:5173", "http://chesslab-frontend:8080", "https://chesslab.joelhutchinson.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
