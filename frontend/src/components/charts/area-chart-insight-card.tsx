@@ -32,15 +32,15 @@ export function AreaChartInsightCard({
       icon={icon}
       description={description}
       chart={
-        // loading ? (
-        //   <AreaChartSkeleton />
-        // ) : error ? (
-        //   <div className="text-sm text-center text-red-500">
-        //     Error loading chart
-        //   </div>
-        // ) : (
-        <InteractiveAreaChart data={data} />
-        // )
+        loading ? (
+          <AreaChartSkeleton />
+        ) : error ? (
+          <div className="text-sm text-center text-red-500">
+            Error loading chart
+          </div>
+        ) : (
+          <InteractiveAreaChart data={data} />
+        )
       }
     />
   );

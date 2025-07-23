@@ -7,85 +7,70 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { ChartContainer, type ChartConfig } from "../ui/chart";
+import { ChartContainer } from "../ui/chart";
+import type { AreaChartData } from "@/lib/types";
 
-const data = [
-  {
-    name: "2024-06-01",
-    value: 4000,
-  },
-  {
-    name: "2024-06-02",
-    value: 3000,
-  },
-  {
-    name: "2024-06-03",
-    value: 2000,
-  },
-  {
-    name: "2024-06-02",
-    value: 3000,
-  },
-  {
-    name: "2024-06-03",
-    value: 2000,
-  },
-  {
-    name: "2024-06-04",
-    value: 2780,
-  },
-  {
-    name: "2024-06-05",
-    value: 1890,
-  },
-  {
-    name: "2024-06-06",
-    value: 2390,
-  },
-  {
-    name: "2024-06-07",
-    value: 3490,
-  },
-];
+interface InteractiveAreaChartProps {
+  data: AreaChartData[];
+}
 
 const chartConfig = {
-  Wins: {
-    label: "Wins",
+  Rating: {
+    label: "Rating",
     color: "var(--chart-1)",
   },
-  Draws: {
-    label: "Draws",
-    color: "var(--chart-3)",
-  },
-  Losses: {
-    label: "Losses",
-    color: "var(--chart-2)",
-  },
-} satisfies ChartConfig;
+};
 
-export function InteractiveAreaChart() {
+export function InteractiveAreaChart({ data }: InteractiveAreaChartProps) {
+  // Helper to determine if the range is over a month and format accordingly
+  function formatTick(dateStr: string) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  // Determine if the range is over 40 days
+  let useMonthDayFormat = false;
+  if (data.length > 1) {
+    const first = new Date(data[0].name);
+    const last = new Date(data[data.length - 1].name);
+    const diffDays = (last.getTime() - first.getTime()) / (1000 * 60 * 60 * 24);
+    useMonthDayFormat = diffDays > 40;
+  }
+
   return (
     <ChartContainer
       config={chartConfig}
-      className="mx-auto my-auto min-h-64 max-h-64 max-w-full"
+      className="mx-auto my-auto min-h-64 max-h-64 w-full"
     >
-      <AreaChart
-        width={500}
-        height={400}
-        data={data}
-        margin={{
-          top: 10,
-          right: 30,
-          left: 0,
-          bottom: 0,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
-      </AreaChart>
+      <ResponsiveContainer width="100%" height={350}>
+        <AreaChart
+          data={data}
+          margin={{
+            top: 10,
+            right: 30,
+            left: 0,
+            bottom: 0,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="name"
+            tickFormatter={useMonthDayFormat ? formatTick : undefined}
+          />
+          <YAxis />
+          <Tooltip />
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke="var(--chart-1)"
+            fill="var(--chart-1)"
+            fillOpacity={0.3}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
     </ChartContainer>
   );
 }
