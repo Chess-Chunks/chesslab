@@ -1,5 +1,5 @@
 from typing import Optional, List
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import re
 import httpx
 from fastapi import HTTPException
@@ -165,8 +165,7 @@ class ChessDotComAdapter(BaseImportAdapter):
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
     ) -> List[RatingInsight]:
-        """Overrides BaseImportAdapter.fetch_rating_history."""
-
+        """Fetch daily rating history, filling gaps with the last known rating."""
         speed = speed or SpeedType.BLITZ
         expected_time_class = "daily" if speed == SpeedType.CLASSICAL else speed.value
 
@@ -184,7 +183,6 @@ class ChessDotComAdapter(BaseImportAdapter):
                 cur = date(cur.year, cur.month + 1, 1)
 
         last_by_date: dict[date, tuple[int, int]] = {}
-
         async with httpx.AsyncClient() as client:
             for yr, mo in months:
                 url = f"{self.BASE_URL}/{self.username}/games/{yr}/{mo:02d}"
@@ -223,8 +221,17 @@ class ChessDotComAdapter(BaseImportAdapter):
                     if not prev or end_ts > prev[0]:
                         last_by_date[game_day] = (end_ts, rating)
 
-        insights = [
-            RatingInsight(date=d, rating=r)
-            for d, (_, r) in sorted(last_by_date.items())
-        ]
-        return insights
+        ratings_by_date = {d: r for d, (_, r) in sorted(last_by_date.items())}
+        full_insights: List[RatingInsight] = []
+        current = start_date
+        last_known = None
+        if ratings_by_date:
+            first_day = min(ratings_by_date)
+            last_known = ratings_by_date[first_day]
+        while current <= end_date:
+            if current in ratings_by_date:
+                last_known = ratings_by_date[current]
+            full_insights.append(RatingInsight(date=current, rating=last_known))
+            current += timedelta(days=1)
+
+        return full_insights

@@ -1,7 +1,7 @@
 """Lichess API Adapter for fetching chess insights."""
 
 from typing import Optional, List
-from datetime import date, datetime
+from datetime import date, timedelta
 from aiohttp import ClientSession
 import json
 import lichess.api
@@ -52,17 +52,14 @@ class LichessAdapter(BaseImportAdapter):
         end_date: Optional[date] = None,
     ) -> List[RatingInsight]:
         """
-        Fetch the user's daily rating history for the specified speed,
-        optionally filtered by date range. Only Bullet, Blitz, Rapid, Classical.
+        Fetch the user's daily rating history, filling gaps with the last known rating.
         """
-
         perf_names = {
             SpeedType.BULLET:    "Bullet",
             SpeedType.BLITZ:     "Blitz",
             SpeedType.RAPID:     "Rapid",
             SpeedType.CLASSICAL: "Classical",
         }
-
         speeds_to_fetch = [speed] if speed else list(perf_names.keys())
 
         url = f"{self.BASE_URL}/user/{self.username}/rating-history"
@@ -71,25 +68,33 @@ class LichessAdapter(BaseImportAdapter):
                 resp.raise_for_status()
                 all_perfs = await resp.json()
 
-        insights: List[RatingInsight] = []
-
+        raw_insights: List[RatingInsight] = []
         for sp in speeds_to_fetch:
             name = perf_names[sp]
             perf_obj = next((p for p in all_perfs if p.get("name") == name), None)
             if not perf_obj or not perf_obj.get("points"):
                 continue
-
-            for year, month0, day, rating in perf_obj["points"]:
-                dt = date(year, month0 + 1, day)
+            for yr, mo0, day, rating in perf_obj["points"]:
+                dt = date(yr, mo0 + 1, day)
                 if start_date and dt < start_date:
                     continue
                 if end_date and dt > end_date:
                     continue
+                raw_insights.append(RatingInsight(date=dt, rating=rating))
 
-                insights.append(RatingInsight(
-                    date=dt,
-                    rating=rating,
-                ))
+        raw_insights.sort(key=lambda ri: ri.date)
+        ratings_by_date = {ri.date: ri.rating for ri in raw_insights}
 
-        insights.sort(key=lambda ri: (ri.date))
-        return insights
+        start = start_date or (min(ratings_by_date) if ratings_by_date else date.today())
+        end = end_date or (max(ratings_by_date) if ratings_by_date else date.today())
+
+        full_insights: List[RatingInsight] = []
+        current = start
+        last_known = ratings_by_date.get(current)
+        while current <= end:
+            if current in ratings_by_date:
+                last_known = ratings_by_date[current]
+            full_insights.append(RatingInsight(date=current, rating=last_known or 0))
+            current += timedelta(days=1)
+
+        return full_insights
