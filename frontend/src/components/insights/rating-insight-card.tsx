@@ -1,31 +1,35 @@
 import { useInsights } from "@/hooks/useInsights";
-import { type Filters } from "@/lib/types";
+import { type Filters, type RatingHistoryData } from "@/lib/types";
 import { AreaChartInsightCard } from "@/components/charts/area-chart-insight-card";
 import { LineChart } from "lucide-react";
 
-type ResultsInsightCardProps = {
+interface RatingInsightCardProps {
   filters: Filters;
-};
+}
 
-export function RatingInsightCard({ filters }: ResultsInsightCardProps) {
+export function RatingInsightCard({ filters }: RatingInsightCardProps) {
   const { data, isLoading, error } = useInsights(
-    "results",
+    "rating-history",
     filters.platform,
     filters.username
   );
+
+  // Map backend data to AreaChartData format
+  const chartData = Array.isArray(data)
+    ? (data as RatingHistoryData[]).map((item) => ({
+        name: item.date,
+        value: item.rating,
+      }))
+    : [];
 
   return (
     <AreaChartInsightCard
       name="Rating History"
       icon={<LineChart className="h-5 w-5" />}
       description="User rating history over time"
-      data={[
-        { name: "Wins", value: data?.wins },
-        { name: "Draws", value: data?.draws },
-        { name: "Losses", value: data?.losses },
-      ]}
+      data={chartData}
       loading={isLoading}
-      error={error ? true : false}
+      error={!!error}
     />
   );
 }
