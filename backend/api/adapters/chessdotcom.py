@@ -224,14 +224,14 @@ class ChessDotComAdapter(BaseImportAdapter):
         ratings_by_date = {d: r for d, (_, r) in sorted(last_by_date.items())}
         full_insights: List[RatingInsight] = []
         current = start_date
-        last_known = None
+        last_known: int = 0
         if ratings_by_date:
             first_day = min(ratings_by_date)
             last_known = ratings_by_date[first_day]
         while current <= end_date:
             if current in ratings_by_date:
                 last_known = ratings_by_date[current]
-            full_insights.append(RatingInsight(date=current, rating=last_known))
+            full_insights.append(RatingInsight(date=current, rating=last_known or 0))
             current += timedelta(days=1)
 
         return full_insights
