@@ -41,3 +41,23 @@ async def get_user_result_summary(
         end_date=end_date,
         color=color,
     )
+
+
+@router.get(
+    "/api/v1/users/{platform}/{username}/rating-history",
+    response_model=list[RatingInsight],
+)
+async def get_user_rating_history(
+    platform: Literal["chessdotcom", "lichess"],
+    username: str,
+    speed: Optional[SpeedType] = Query(None, description="bullet, blitz, rapid, classical"),
+    start_date: Optional[date] = Query(None, description="Filter by start date (YYYY-MM-DD)"),
+    end_date: Optional[date] = Query(None, description="Filter by end date (YYYY-MM-DD)"),
+):
+    """Fetch the user's rating history for a specific platform, with optional filters."""
+    adapter = get_adapter(platform, username)
+    return await adapter.fetch_rating_history(
+        speed=speed,
+        start_date=start_date,
+        end_date=end_date,
+    )
