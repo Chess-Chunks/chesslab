@@ -1,8 +1,9 @@
 """Lichess API Adapter for fetching chess insights."""
 
 from typing import Optional, List
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from aiohttp import ClientSession
+import aiohttp
 import json
 import lichess.api
 from api.models.insights import RatingInsight, ResultSummary
@@ -27,22 +28,87 @@ class LichessAdapter(BaseImportAdapter):
         self,
         speed: Optional[SpeedType] = None,
         start_date: Optional[date] = None,
-        end_date: Optional[date] = None
+        end_date: Optional[date] = None,
+        color: Optional[str] = None,
     ) -> ResultSummary:
-        speed_key = self._get_speed_perf_key(speed) if speed else "blitz"
-        url = f"{self.BASE_URL}/user/{self.username}/perf/{speed_key}"
+        speed_key = self._get_speed_perf_key(speed or SpeedType.BLITZ)
+
+        # No date filtering: use perf endpoint (faster)
+        if start_date is None and end_date is None:
+            url = f"{self.BASE_URL}/user/{self.username}/perf/{speed_key}"
+            async with ClientSession() as session:
+                async with session.get(url) as response:
+                    response.raise_for_status()
+                    data = await response.json()
+
+            stats = data.get("stat", {}).get("count", {})
+            return ResultSummary(
+                total=stats.get("total", 0),
+                wins=stats.get("win", 0),
+                losses=stats.get("loss", 0),
+                draws=stats.get("draw", 0),
+                speed=speed or SpeedType.BLITZ,
+            )
+
+        # Convert date range to timestamps
+        start_ts = int(datetime.combine(start_date or date.min, datetime.min.time()).timestamp() * 1000)
+        end_ts = int(datetime.combine(end_date or date.max, datetime.max.time()).timestamp() * 1000)
+        
+        url = (
+            f"{self.BASE_URL}/games/user/{self.username}"
+            f"?since={start_ts}&until={end_ts}&max=3000&perfType={speed_key}&pgnInJson=true"
+        )
+        headers = {"Accept": "application/x-ndjson"}
+
+        wins = losses = draws = 0
 
         async with ClientSession() as session:
-            async with session.get(url) as response:
+            async with session.get(url, headers=headers) as response:
                 response.raise_for_status()
-                data = await response.json()
+                async for line in response.content:
+                    if not line.strip():
+                        continue
+                    try:
+                        game = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
 
-        stats = data.get("stat", {}).get("count", {})
+                    if game.get("speed") != speed_key:
+                        continue
+
+                    player_color = None
+                    if game.get("players", {}).get("white", {}).get("user", {}).get("id", "").lower() == self.username.lower():
+                        player_color = "white"
+                    elif game.get("players", {}).get("black", {}).get("user", {}).get("id", "").lower() == self.username.lower():
+                        player_color = "black"
+                    else:
+                        continue
+
+                    winner = game.get("winner")
+
+                    if (winner == "white" and player_color == "white") or (winner == "black" and player_color == "black"):
+                        result = "win"
+                    elif winner is None:
+                        result = "draw"
+                    else:
+                        result = "loss"
+
+                    if color and player_color != color.lower():
+                        continue
+
+                    if result == "win":
+                        wins += 1
+                    elif result == "loss":
+                        losses += 1
+                    elif result == "draw":
+                        draws += 1
+
         return ResultSummary(
-            wins=stats.get("win", 0),
-            losses=stats.get("loss", 0),
-            draws=stats.get("draw", 0),
-            speed=speed or "blitz"
+            total=wins + losses + draws,
+            wins=wins,
+            losses=losses,
+            draws=draws,
+            speed=speed or SpeedType.BLITZ,
         )
 
     async def fetch_rating_history(

@@ -48,6 +48,7 @@ class ChessDotComAdapter(BaseImportAdapter):
             draws = record.draw or 0 if record else 0
 
             return ResultSummary(
+                total=wins + losses + draws,
                 wins=wins,
                 losses=losses,
                 draws=draws,
@@ -124,6 +125,7 @@ class ChessDotComAdapter(BaseImportAdapter):
                     )
 
         return ResultSummary(
+            total=wins + losses + draws,
             wins=wins,
             losses=losses,
             draws=draws,

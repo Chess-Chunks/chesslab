@@ -12,6 +12,7 @@ class RatingInsight(BaseModel):
 
 class ResultSummary(BaseModel):
     """Model for summarizing game results."""
+    total: int
     wins: int
     losses: int
     draws: int
