@@ -109,6 +109,8 @@ export function InteractivePieChart({ data }: InteractivePieChartProps) {
           label={renderCustomizedLabel}
           outerRadius={80}
           fill="#8884d8"
+          stroke="var(--chart-1)"
+          fillOpacity={0.5}
           dataKey="value"
         >
           {data.map((entry) => (
