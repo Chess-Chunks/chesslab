@@ -167,40 +167,73 @@ class ChessDotComAdapter(BaseImportAdapter):
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
     ) -> List[RatingInsight]:
-        """Fetch daily rating history, filling gaps with the last known rating."""
+        """Fetch daily rating history, filling gaps with the last known rating.
+        If no start_date/end_date are provided, pulls the full available history."""
         speed = speed or SpeedType.BLITZ
         expected_time_class = "daily" if speed == SpeedType.CLASSICAL else speed.value
 
-        start_date = start_date or date.min
-        end_date = end_date or date.max
+        full_history = start_date is None and end_date is None
 
-        cur = date(start_date.year, start_date.month, 1)
-        last_month = date(end_date.year, end_date.month, 1)
+        ym_re = re.compile(r"/games/archives/(\d{4})/(\d{2})$")
+
         months: List[tuple[int, int]] = []
-        while cur <= last_month:
-            months.append((cur.year, cur.month))
-            if cur.month == 12:
-                cur = date(cur.year + 1, 1, 1)
-            else:
-                cur = date(cur.year, cur.month + 1, 1)
 
-        last_by_date: dict[date, tuple[int, int]] = {}
         async with httpx.AsyncClient() as client:
+            if full_history:
+
+                archive_url = f"{self.BASE_URL}/{self.username}/games/archives"
+                try:
+                    resp = await client.get(archive_url)
+                    resp.raise_for_status()
+                except Exception as e:
+                    raise HTTPException(
+                        status_code=503,
+                        detail=f"Failed to fetch archive list: {e}",
+                    )
+                archive_urls = resp.json().get("archives", [])
+
+                for url in archive_urls:
+                    m = ym_re.search(url)
+                    if not m:
+                        continue
+                    yr, mo = int(m.group(1)), int(m.group(2))
+                    months.append((yr, mo))
+
+                if not months:
+                    return []
+
+                months.sort()
+                first_year, first_month = months[0]
+                last_year, last_month = months[-1]
+                start_date = date(first_year, first_month, 1)
+                last_day = calendar.monthrange(last_year, last_month)[1]
+                end_date = date(last_year, last_month, last_day)
+
+            else:
+                start_date = start_date or date.min
+                end_date = end_date or date.max
+
+                cur = date(start_date.year, start_date.month, 1)
+                last_month = date(end_date.year, end_date.month, 1)
+                while cur <= last_month:
+                    months.append((cur.year, cur.month))
+                    if cur.month == 12:
+                        cur = date(cur.year + 1, 1, 1)
+                    else:
+                        cur = date(cur.year, cur.month + 1, 1)
+
+            last_by_date: dict[date, tuple[int, int]] = {}
             for yr, mo in months:
                 url = f"{self.BASE_URL}/{self.username}/games/{yr}/{mo:02d}"
                 try:
                     resp = await client.get(url)
                     resp.raise_for_status()
-                except httpx.HTTPStatusError:
-                    continue
-                except httpx.RequestError:
+                except (httpx.HTTPStatusError, httpx.RequestError):
                     continue
 
-                data = resp.json()
-                for game in data.get("games", []):
+                for game in resp.json().get("games", []):
                     if game.get("time_class") != expected_time_class:
                         continue
-
                     end_ts = game.get("end_time")
                     if not end_ts:
                         continue
@@ -224,9 +257,10 @@ class ChessDotComAdapter(BaseImportAdapter):
                         last_by_date[game_day] = (end_ts, rating)
 
         ratings_by_date = {d: r for d, (_, r) in sorted(last_by_date.items())}
+
         full_insights: List[RatingInsight] = []
         current = start_date
-        last_known: int = 0
+        last_known = 0
         if ratings_by_date:
             first_day = min(ratings_by_date)
             last_known = ratings_by_date[first_day]
